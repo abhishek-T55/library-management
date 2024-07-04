@@ -1,9 +1,11 @@
 from typing import Any, List
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Request
 from app.db.models import UserCreate, User, UserUpdate, UserPublic
 import app.crud
 from app.api.v1.deps import get_current_user
 from app.api.v1.deps import SessionDep
+
+from app.utils.rate_limiting import limiter
 
 
 router = APIRouter()
@@ -20,14 +22,16 @@ def get_user_by_id(user_id: int, session: SessionDep):
 
 
 @router.get("/", dependencies=[Depends(get_current_user)], response_model=List[User])
-def list_all_users(*, session: SessionDep):
+@limiter.limit("10/minute")
+def list_all_users(*, request:Request, session: SessionDep):
     return app.crud.get_all_users(session=session)
 
 
 @router.post(
     "/", dependencies=[Depends(get_current_user)], response_model=User
 )
-def create_user(*, session: SessionDep, user_in: UserCreate) -> Any:
+@limiter.limit("2/minute")
+def create_user(*, request: Request, session: SessionDep, user_in: UserCreate) -> Any:
     user = app.crud.create_user(session=session, user_create=user_in)
     return user
 

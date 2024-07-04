@@ -8,6 +8,8 @@ alembic
 python-jose[cryptography]
 passlib
 python-dotenv
+slowapi
+ipdb
 sqlalchemy_json
 redis
 psycopg[binary,pool]
