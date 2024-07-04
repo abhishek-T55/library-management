@@ -1,9 +1,14 @@
-from typing import Any
+from typing import Any, List
 
 from sqlmodel import Session, select
 
 from app.core.security import get_password_hash, verify_password
 from app.db.models import User, UserCreate, UserUpdate
+
+def get_all_users(*, session: Session) -> List[User]:
+    users = session.exec(select(User)).all()
+    return users
+
 
 def create_user(*, session: Session, user_create: UserCreate) -> User:
     db_obj = User.model_validate(
@@ -27,6 +32,14 @@ def update_user(*, session: Session, db_user: User, user_in: UserUpdate) -> Any:
     session.add(db_user)
     session.commit()
     session.refresh(db_user)
+    return db_user
+
+def delete_user(*, session: Session, user_id: int) -> Any:
+    db_user = session.get(User, user_id)
+    if not db_user:
+        return None
+    session.delete(db_user)
+    session.commit()
     return db_user
 
 def get_user_by_email(*, session: Session, email: str) -> User | None:
