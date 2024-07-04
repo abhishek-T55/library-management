@@ -5,6 +5,8 @@ pydantic_settings
 sqlalchemy
 sqlmodel
 alembic
+python-jose[cryptography]
+passlib
 python-dotenv
 sqlalchemy_json
 redis

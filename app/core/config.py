@@ -1,3 +1,4 @@
+import secrets
 import logging
 from pydantic_settings import BaseSettings
 from pydantic import AnyUrl
@@ -24,7 +25,9 @@ class RabbitMQConfig(BaseSettings):
 
 
 class Config(BaseSettings):
+    project_name: str
     debug: bool = True
+    secret_key: str = secrets.token_urlsafe(32)
 
     redis: RedisConfig = RedisConfig()
     database: DatabaseConfig
