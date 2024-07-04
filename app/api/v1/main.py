@@ -1,9 +1,6 @@
-# from fastapi import APIRouter
+from fastapi import APIRouter
 
-# from app.api.routes import items, login, users, utils
-# from app.api.v1.endpoints import users, books
+from app.api.v1.endpoints import users
 
-# api_router = APIRouter()
-# api_router.include_router(login.router, tags=["login"])
-# api_router.include_router(users.router, prefix="/users", tags=["users"])
-# api_router.include_router(utils.router, prefix="/books", tags=["books"])
+api_router = APIRouter()
+api_router.include_router(users.router, prefix="/users", tags=["Users"])

@@ -1,5 +1,4 @@
-from sqlmodel import Field, Relationship, SQLModel
-from .user import User
+from sqlmodel import Field, SQLModel
 
 class BookBase(SQLModel):
     title: str = Field(min_length=1, max_length=255)
@@ -17,5 +16,5 @@ class BookUpdate(BookBase):
 class Book(BookBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     title: str = Field(max_length=255)
-    owner_id: int | None = Field(default=None, foreign_key="user.id", nullable=False)
-    owner: User | None = Relationship(back_populates="books")
+    # owner_id: int | None = Field(default=None, foreign_key="user.id", nullable=False)
+    # owner: User | None = Relationship(back_populates="books")
