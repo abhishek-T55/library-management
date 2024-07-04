@@ -1,0 +1,14 @@
+__pycache__
+*.pyc
+*.log
+env
+venv
+test.db
+.coverage
+htmlcov
+.env
+config.yml
+temp.*
+.vscode
+.ruff_cache
+_pg_data/*
