@@ -1,14 +1,15 @@
 from typing import Any
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from app.db.models import UserCreate, User, UserUpdate
 import app.crud
+from app.api.v1.deps import get_current_user
 from app.api.v1.deps import SessionDep
 
 
 router = APIRouter()
 
 @router.post(
-    "/", response_model=User
+    "/", dependencies=[Depends(get_current_user)], response_model=User
 )
 def create_user(*, session: SessionDep, user_in: UserCreate) -> Any:
     user = app.crud.create_user(session=session, user_create=user_in)

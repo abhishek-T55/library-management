@@ -28,6 +28,7 @@ class Config(BaseSettings):
     project_name: str
     debug: bool = True
     secret_key: str = secrets.token_urlsafe(32)
+    access_token_expire_minutes: int = 10
 
     redis: RedisConfig = RedisConfig()
     database: DatabaseConfig

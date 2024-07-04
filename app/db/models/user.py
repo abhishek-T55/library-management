@@ -32,3 +32,13 @@ class User(UserBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     hashed_password: str
     # items: list["Book"] = Relationship(back_populates="owner")
+
+class UserPublic(SQLModel):
+    id: int
+
+class Token(SQLModel):
+    access_token: str
+    token_type: str = "bearer"
+
+class TokenPayload(SQLModel):
+    sub: int | None = None
