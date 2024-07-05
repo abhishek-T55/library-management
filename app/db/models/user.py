@@ -1,5 +1,6 @@
-from sqlmodel import SQLModel, Field
+from sqlmodel import SQLModel, Field, Relationship
 from pydantic import EmailStr
+from typing import List
 
 
 class UserBase(SQLModel):
@@ -32,7 +33,7 @@ class User(UserBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     hashed_password: str
     login_attempts: int = Field(default=0)
-    # items: list["Book"] = Relationship(back_populates="owner")
+    books: List["Book"] = Relationship(back_populates="owner")
 
 class UserPublic(SQLModel):
     id: int
