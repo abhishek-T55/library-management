@@ -11,4 +11,4 @@ engine = create_engine(str(config.database.url))
 
 
 def init_db(session: Session) -> None:
-    print("database initialized")
+    pass

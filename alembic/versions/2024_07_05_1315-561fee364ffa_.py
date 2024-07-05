@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: f48ef55b412c
+Revision ID: 561fee364ffa
 Revises: 
-Create Date: 2024-07-05 01:04:20.523968
+Create Date: 2024-07-05 13:15:12.880893
 
 """
 import sqlmodel
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'f48ef55b412c'
+revision: str = '561fee364ffa'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -33,6 +33,7 @@ def upgrade() -> None:
     sa.Column('full_name', sqlmodel.sql.sqltypes.AutoString(length=100), nullable=True),
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('hashed_password', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('login_attempts', sa.Integer(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_user_email'), 'user', ['email'], unique=True)

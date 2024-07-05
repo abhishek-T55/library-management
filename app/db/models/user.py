@@ -31,7 +31,7 @@ class UserUpdateMe(SQLModel):
 class User(UserBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     hashed_password: str
-    login_attempts: str = Field(default=0)
+    login_attempts: int = Field(default=0)
     # items: list["Book"] = Relationship(back_populates="owner")
 
 class UserPublic(SQLModel):

@@ -52,5 +52,11 @@ def authenticate(*, session: Session, email: str, password: str) -> User | None:
     if not db_user:
         return None
     if not verify_password(password, db_user.hashed_password):
+        db_user.login_attempts += 1
+        if db_user.login_attempts >= 5:
+            db_user.is_locked = True
+        session.commit()
         return None
+    db_user.login_attempts = 0
+    session.commit()
     return db_user

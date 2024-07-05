@@ -39,7 +39,7 @@ def list_all_users(*, request:Request, session: SessionDep):
 @router.post(
     "/", dependencies=[Depends(get_current_user)], response_model=User
 )
-@limiter.limit("2/minute")
+@limiter.limit("5/minute")
 def create_user(*, request: Request, session: SessionDep, user_in: UserCreate) -> Any:
     user = app.crud.create_user(session=session, user_create=user_in)
     return user

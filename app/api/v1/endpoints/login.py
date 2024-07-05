@@ -24,11 +24,6 @@ def login_access_token(
         session=session, email=form_data.username, password=form_data.password
     )
 
-    # valid_email_user = app.crud.get_user_by_email(form_data.username)
-    # if valid_email_user and (not user):
-    #     # increment the login attempt counter
-    #     pass
-
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect email or password")
     elif user.is_locked:
