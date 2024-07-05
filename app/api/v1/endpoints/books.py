@@ -1,5 +1,5 @@
 from app.db.models import BookCreate, Book, BookUpdate
-from fastapi import APIRouter, HTTPException, Request, Depends
+from fastapi import APIRouter, Request, Depends
 import app.crud
 import json
 from app.api.v1.deps import get_current_user
