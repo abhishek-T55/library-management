@@ -13,20 +13,9 @@ class UserCreate(UserBase):
     password: str = Field(min_length=8, max_length=20)
 
 
-class UserRegister(SQLModel):
-    email: EmailStr = Field(max_length=255)
-    password: str = Field(min_length=8, max_length=20)
-    full_name: str | None = Field(default=None, max_length=200)
-
-
 class UserUpdate(UserBase):
     email: EmailStr | None = Field(default=None, max_length=200)
     password: str | None = Field(default=None, min_length=8, max_length=20)
-
-
-class UserUpdateMe(SQLModel):
-    full_name: str | None = Field(default=None, max_length=100)
-    email: EmailStr | None = Field(default=None, max_length=200)
 
 
 class User(UserBase, table=True):
@@ -35,12 +24,15 @@ class User(UserBase, table=True):
     login_attempts: int = Field(default=0)
     books: List["Book"] = Relationship(back_populates="owner")
 
+
 class UserPublic(SQLModel):
     id: int
+
 
 class Token(SQLModel):
     access_token: str
     token_type: str = "bearer"
+
 
 class TokenPayload(SQLModel):
     sub: int | None = None

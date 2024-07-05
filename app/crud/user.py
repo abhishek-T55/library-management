@@ -3,7 +3,8 @@ from typing import Any, List
 from sqlmodel import Session, select
 
 from app.core.security import get_password_hash, verify_password
-from app.db.models import User, UserCreate, UserUpdate
+from app.db.models import User
+from app.schemas.user import UserCreate, UserUpdate, UserResponse
 from app.exceptions import UserNotFoundException, InvalidCredentialsException, UserLockedException
 
 def get_all_users(*, session: Session) -> List[User]:
@@ -11,7 +12,7 @@ def get_all_users(*, session: Session) -> List[User]:
     return users
 
 
-def create_user(*, session: Session, user_create: UserCreate) -> User:
+def create_user(*, session: Session, user_create: UserCreate) -> UserResponse:
     db_obj = User.model_validate(
         user_create, update={
             "hashed_password": get_password_hash(user_create.password)

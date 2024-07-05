@@ -5,6 +5,8 @@ import json
 from app.api.v1.deps import get_current_user
 from app.api.v1.deps import SessionDep
 from app.db.models import User
+from app.schemas.book import BookResponse
+from app.exceptions import BookNotFoundException
 import app.utils.cache
 from typing import Any, List
 
@@ -15,7 +17,7 @@ from app.utils.rate_limiting import limiter
 router = APIRouter()
 
 
-@router.get("/{book_id}", dependencies=[Depends(get_current_user)], response_model=Book)
+@router.get("/{book_id}", dependencies=[Depends(get_current_user)], response_model=BookResponse)
 @limiter.limit("20/minute")
 def get_book_by_id(request: Request, book_id: int, session: SessionDep):
     cached_book = redis_client.get(f"book: {book_id}")
@@ -23,10 +25,7 @@ def get_book_by_id(request: Request, book_id: int, session: SessionDep):
         return json.loads(cached_book)
     db_book = session.get(Book, book_id)
     if not db_book:
-        raise HTTPException(
-            status_code=404,
-            detail="The book with this id does not exist in the system",
-        )
+        raise BookNotFoundException()
     redis_client.setex(f"book: {book_id}", 60, json.dumps(db_book.model_dump()))
     return db_book
 
@@ -37,7 +36,7 @@ def create_book(*, request: Request, session: SessionDep, book_in: BookCreate,  
     return book
 
 
-@router.get("/", dependencies=[Depends(get_current_user)], response_model=List[Book])
+@router.get("/", dependencies=[Depends(get_current_user)], response_model=List[BookResponse])
 @limiter.limit("10/minute")
 def list_all_books(*, request: Request, session: SessionDep):
     db_books = app.crud.get_all_books(session=session)
@@ -45,16 +44,16 @@ def list_all_books(*, request: Request, session: SessionDep):
     return db_books
 
 
-@router.delete("/{book_id}", dependencies=[Depends(get_current_user)], response_model=Book)
+@router.delete("/{book_id}", dependencies=[Depends(get_current_user)], response_model=BookResponse)
 def delete_book(book_id: int, session: SessionDep):
     book = app.crud.delete_book(session=session, book_id=book_id)
     if not book:
-        raise HTTPException(status_code=404, detail="Book not found")
+        raise BookNotFoundException()
     return book
 
 @router.patch(
     "/{book_id}",
-    response_model=Book,
+    response_model=BookResponse,
 )
 def update_book(
     *,
@@ -64,9 +63,6 @@ def update_book(
 ) -> Any:
     db_book = session.get(Book, book_id)
     if not db_book:
-        raise HTTPException(
-            status_code=404,
-            detail="The book with this id does not exist in the system",
-        )
+        raise BookNotFoundException()
     db_book = app.crud.update_book(session=session, db_book=db_book, book_in=book_in)
     return db_book

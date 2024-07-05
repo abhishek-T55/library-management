@@ -1,13 +1,14 @@
 from typing import Any, List
 from sqlmodel import Session, select
 from app.db.models import Book, BookCreate, BookUpdate
+from app.schemas.book import BookResponse
 from app.exceptions import BookNotFoundException
 
-def get_all_books(*, session: Session) -> List[Book]:
+def get_all_books(*, session: Session) -> List[BookResponse]:
     books = session.exec(select(Book)).all()
     return books
 
-def create_book(*, session: Session, book_create: BookCreate, owner_id: int) -> Book:
+def create_book(*, session: Session, book_create: BookCreate, owner_id: int) -> BookResponse:
     db_book = Book.model_validate(book_create)
     db_book.owner_id = owner_id
     session.add(db_book)

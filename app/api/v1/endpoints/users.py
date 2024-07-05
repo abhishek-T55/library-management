@@ -11,11 +11,12 @@ from app.utils.cache import redis_client
 import app.utils
 from app.utils.rate_limiting import limiter
 from app.services.task_scheduler import send_registration_email
+from app.schemas.user import UserResponse
 from app.exceptions import UserNotFoundException, UserAlreadyExistsException
 
 router = APIRouter()
 
-@router.get("/{user_id}", dependencies=[Depends(get_current_user)], response_model=User)
+@router.get("/{user_id}", dependencies=[Depends(get_current_user)], response_model=UserResponse)
 def get_user_by_id(user_id: int, session: SessionDep):
     cached_user = redis_client.get(f"user: {user_id}")
     if cached_user:
@@ -27,7 +28,7 @@ def get_user_by_id(user_id: int, session: SessionDep):
     return db_user
 
 
-@router.get("/", dependencies=[Depends(get_current_user)], response_model=List[User])
+@router.get("/", dependencies=[Depends(get_current_user)], response_model=List[UserResponse])
 @limiter.limit("10/minute")
 def list_all_users(*, request:Request, session: SessionDep):
     db_users = app.crud.get_all_users(session=session)
@@ -36,7 +37,7 @@ def list_all_users(*, request:Request, session: SessionDep):
 
 
 @router.post(
-    "/", dependencies=[Depends(get_current_user)], response_model=User
+    "/", dependencies=[Depends(get_current_user)], response_model=UserResponse
 )
 @limiter.limit("5/minute")
 def create_user(*, request: Request, session: SessionDep, user_in: UserCreate) -> Any:
@@ -50,7 +51,7 @@ def create_user(*, request: Request, session: SessionDep, user_in: UserCreate) -
 
 @router.patch(
     "/{user_id}",
-    response_model=User,
+    response_model=UserResponse,
 )
 def update_user(
     *,
