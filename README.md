@@ -15,7 +15,7 @@ Ensure you have the following installed on your system or hosted on docker:
 1. **Clone the repository**:
 
 ```bash
-git clone git@github.com:abhishek-T55/library-management.git
+git clone https://github.com/abhishek-T55/library-management.git
 cd library-management
 ```
 
