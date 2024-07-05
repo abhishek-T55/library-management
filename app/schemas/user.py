@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel, EmailStr, field_validator
 
 
@@ -32,7 +33,10 @@ class UserResponse(UserBase):
     id: int
     full_name: str | None
     email: EmailStr
-    total_books: int
 
     class Config:
         from_attributes = True
+
+
+class UserBookCountResponse(UserResponse):
+    total_books: int | None

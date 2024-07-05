@@ -12,7 +12,7 @@ from app.utils.cache import redis_client
 import app.utils
 from app.utils.rate_limiting import limiter
 from app.services.task_scheduler import send_registration_email
-from app.schemas.user import UserResponse, UserCreate
+from app.schemas.user import UserResponse, UserCreate, UserBookCountResponse
 from app.exceptions import UserNotFoundException, UserAlreadyExistsException
 
 router = APIRouter()
@@ -20,7 +20,7 @@ router = APIRouter()
 @router.get(
     "/{user_id}",
     dependencies=[Depends(get_current_user)],
-    response_model=UserResponse
+    response_model=UserBookCountResponse
 )
 def get_user_by_id(
     user_id: int,
@@ -33,7 +33,7 @@ def get_user_by_id(
     if not db_user:
         raise UserNotFoundException()
     total_books = len(session.exec(select(Book).where(Book.owner_id == user_id)).all())
-    user_response = UserResponse(
+    user_response = UserBookCountResponse(
         id=db_user.id,
         email=db_user.email,
         full_name=db_user.full_name,
