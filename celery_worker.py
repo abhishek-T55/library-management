@@ -1,9 +1,10 @@
 from celery import Celery
+from app.core.config import config
 
 celery_app = Celery(
     __name__,
-    broker="redis://default:password@localhost:6379/0",
-    backend="redis://default:password@localhost:6379/0",
+    broker=config.rabbitmq.url,
+    backend="rpc://"
 )
 
 celery_app.conf.update(

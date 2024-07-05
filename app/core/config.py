@@ -21,7 +21,7 @@ class RedisConfig(BaseSettings):
 
 
 class RabbitMQConfig(BaseSettings):
-    pass
+    url: str | None = None
 
 
 class Config(BaseSettings):
