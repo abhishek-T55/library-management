@@ -32,6 +32,7 @@ class UserResponse(UserBase):
     id: int
     full_name: str | None
     email: EmailStr
+    total_books: int
 
     class Config:
         from_attributes = True

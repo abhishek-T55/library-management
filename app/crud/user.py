@@ -7,8 +7,9 @@ from app.db.models import User
 from app.schemas.user import UserCreate, UserUpdate, UserResponse
 from app.exceptions import UserNotFoundException, InvalidCredentialsException, UserLockedException
 
-def get_all_users(*, session: Session) -> List[User]:
-    users = session.exec(select(User)).all()
+def get_all_users(*, session: Session, skip: int = 0, limit: int = 10) -> List[User]:
+    statement = select(User).offset(skip).limit(limit)
+    users = session.exec(statement).all()
     return users
 
 

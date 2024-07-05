@@ -1,7 +1,8 @@
 from typing import Any, List
 import json
+from sqlmodel import select
 from fastapi import APIRouter, HTTPException, Depends, Request
-from app.db.models import User, UserUpdate, UserPublic
+from app.db.models import User, UserUpdate, UserPublic, Book
 import app.crud
 from app.api.v1.deps import get_current_user
 from app.api.v1.deps import SessionDep
@@ -16,22 +17,42 @@ from app.exceptions import UserNotFoundException, UserAlreadyExistsException
 
 router = APIRouter()
 
-@router.get("/{user_id}", dependencies=[Depends(get_current_user)], response_model=UserResponse)
-def get_user_by_id(user_id: int, session: SessionDep):
+@router.get(
+    "/{user_id}",
+    dependencies=[Depends(get_current_user)],
+    response_model=UserResponse
+)
+def get_user_by_id(
+    user_id: int,
+    session: SessionDep
+):
     cached_user = redis_client.get(f"user: {user_id}")
     if cached_user:
         return json.loads(cached_user)
     db_user = session.get(User, user_id)
     if not db_user:
         raise UserNotFoundException()
-    redis_client.setex(f"user: {user_id}", 60, json.dumps(db_user.model_dump()))
-    return db_user
+    total_books = len(session.exec(select(Book).where(Book.owner_id == user_id)).all())
+    user_response = UserResponse(
+        id=db_user.id,
+        email=db_user.email,
+        full_name=db_user.full_name,
+        is_locked=db_user.is_locked,
+        total_books=total_books,
+    )
+    redis_client.setex(f"user: {user_response}", 60, json.dumps(db_user.model_dump()))
+    return user_response
 
 
 @router.get("/", dependencies=[Depends(get_current_user)], response_model=List[UserResponse])
 @limiter.limit("10/minute")
-def list_all_users(*, request:Request, session: SessionDep):
-    db_users = app.crud.get_all_users(session=session)
+def list_all_users(
+    request:Request,
+    session: SessionDep,
+    skip: int = 0,
+    limit: int = 10,
+):
+    db_users = app.crud.get_all_users(session=session, skip=skip, limit=limit)
     redis_client.setex("users", 60, json.dumps([user.model_dump() for user in db_users]))
     return db_users
 
