@@ -1,4 +1,5 @@
-from app.db.models import BookCreate, Book, BookUpdate
+from app.db.models import Book, BookUpdate
+from app.schemas.book import BookCreate
 from fastapi import APIRouter, Request, Depends
 import app.crud
 import json

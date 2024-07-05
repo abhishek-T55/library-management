@@ -1,4 +1,4 @@
-from pydantic import BaseModel, HttpUrl
+from pydantic import BaseModel, field_validator
 
 
 class BookBase(BaseModel):
@@ -10,11 +10,17 @@ class BookBase(BaseModel):
 class BookCreate(BookBase):
     title: str
 
+    @field_validator("url")
+    def validate_http_url(cls, v: str) -> str:
+        if not v.startswith(("http://", "https://")):
+            raise ValueError("URL must start with http:// or https://")
+        return v
+
 
 class BookUpdate(BookBase):
     title: str = None
     description: str = None
-    url: HttpUrl = None
+    url: str = None
 
 
 class BookResponse(BookBase):

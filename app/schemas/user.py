@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, field_validator
 
 
 class UserBase(BaseModel):
@@ -9,6 +9,18 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str
+
+    @field_validator("password")
+    def password_length(cls, v):
+        if len(v) < 8 or len(v) > 20:
+            raise ValueError("Password must be between 8 and 20 characters")
+        return v
+
+    @field_validator("full_name")
+    def full_name_length(cls, v):
+        if v and len(v) > 100:
+            raise ValueError("Full name must be less than 100 characters")
+        return v
 
 
 class UserUpdate(UserBase):

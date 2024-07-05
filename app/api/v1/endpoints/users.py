@@ -1,7 +1,7 @@
 from typing import Any, List
 import json
 from fastapi import APIRouter, HTTPException, Depends, Request
-from app.db.models import UserCreate, User, UserUpdate, UserPublic
+from app.db.models import User, UserUpdate, UserPublic
 import app.crud
 from app.api.v1.deps import get_current_user
 from app.api.v1.deps import SessionDep
@@ -11,7 +11,7 @@ from app.utils.cache import redis_client
 import app.utils
 from app.utils.rate_limiting import limiter
 from app.services.task_scheduler import send_registration_email
-from app.schemas.user import UserResponse
+from app.schemas.user import UserResponse, UserCreate
 from app.exceptions import UserNotFoundException, UserAlreadyExistsException
 
 router = APIRouter()
