@@ -11,6 +11,7 @@ from app.utils.cache import redis_client
 import app.utils
 from app.utils.rate_limiting import limiter
 from app.services.task_scheduler import send_registration_email
+from app.exceptions import UserNotFoundException, UserAlreadyExistsException
 
 router = APIRouter()
 
@@ -21,10 +22,7 @@ def get_user_by_id(user_id: int, session: SessionDep):
         return json.loads(cached_user)
     db_user = session.get(User, user_id)
     if not db_user:
-        raise HTTPException(
-            status_code=404,
-            detail="The user with this id does not exist in the system",
-        )
+        raise UserNotFoundException()
     redis_client.setex(f"user: {user_id}", 60, json.dumps(db_user.model_dump()))
     return db_user
 
@@ -42,6 +40,9 @@ def list_all_users(*, request:Request, session: SessionDep):
 )
 @limiter.limit("5/minute")
 def create_user(*, request: Request, session: SessionDep, user_in: UserCreate) -> Any:
+    user = app.crud.get_user_by_email(session=session, email=user_in.email)
+    if user:
+        raise UserAlreadyExistsException()
     user = app.crud.create_user(session=session, user_create=user_in)
     send_registration_email(user.email)
     return user

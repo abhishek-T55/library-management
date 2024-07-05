@@ -4,6 +4,7 @@ from sqlmodel import Session, select
 
 from app.core.security import get_password_hash, verify_password
 from app.db.models import User, UserCreate, UserUpdate
+from app.exceptions import UserNotFoundException, InvalidCredentialsException, UserLockedException
 
 def get_all_users(*, session: Session) -> List[User]:
     users = session.exec(select(User)).all()
@@ -37,7 +38,7 @@ def update_user(*, session: Session, db_user: User, user_in: UserUpdate) -> Any:
 def delete_user(*, session: Session, user_id: int) -> Any:
     db_user = session.get(User, user_id)
     if not db_user:
-        return None
+        raise UserNotFoundException()
     session.delete(db_user)
     session.commit()
     return db_user
@@ -50,13 +51,15 @@ def get_user_by_email(*, session: Session, email: str) -> User | None:
 def authenticate(*, session: Session, email: str, password: str) -> User | None:
     db_user = get_user_by_email(session=session, email=email)
     if not db_user:
-        return None
+        raise InvalidCredentialsException()
+    if db_user.is_locked:
+        raise UserLockedException()
     if not verify_password(password, db_user.hashed_password):
         db_user.login_attempts += 1
         if db_user.login_attempts >= 5:
             db_user.is_locked = True
         session.commit()
-        return None
+        raise InvalidCredentialsException()
     db_user.login_attempts = 0
     session.commit()
     return db_user

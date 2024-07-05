@@ -1,6 +1,7 @@
 from typing import Any, List
 from sqlmodel import Session, select
 from app.db.models import Book, BookCreate, BookUpdate
+from app.exceptions import BookNotFoundException
 
 def get_all_books(*, session: Session) -> List[Book]:
     books = session.exec(select(Book)).all()
@@ -17,7 +18,7 @@ def create_book(*, session: Session, book_create: BookCreate, owner_id: int) -> 
 def delete_book(*, session: Session, book_id: int) -> Any:
     db_book = session.get(Book, book_id)
     if not db_book:
-        return None
+        raise BookNotFoundException()
     session.delete(db_book)
     session.commit()
     return db_book
