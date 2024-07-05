@@ -1,6 +1,7 @@
 fastapi
 uvicorn
 pydantic
+celery
 pydantic_settings
 sqlalchemy
 sqlmodel

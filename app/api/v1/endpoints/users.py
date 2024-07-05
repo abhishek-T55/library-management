@@ -10,6 +10,7 @@ import app.utils.cache
 from app.utils.cache import redis_client
 import app.utils
 from app.utils.rate_limiting import limiter
+from app.services.task_scheduler import send_registration_email
 
 router = APIRouter()
 
@@ -42,6 +43,7 @@ def list_all_users(*, request:Request, session: SessionDep):
 @limiter.limit("5/minute")
 def create_user(*, request: Request, session: SessionDep, user_in: UserCreate) -> Any:
     user = app.crud.create_user(session=session, user_create=user_in)
+    send_registration_email(user.email)
     return user
 
 
