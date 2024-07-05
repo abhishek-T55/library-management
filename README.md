@@ -27,7 +27,7 @@ pip install -r requirements.txt
 
 3. **Create and configure the `.env` file.**:
 
-Create a `.env` file in the project root directory. A sample file `.env.example` is provided. Copy its content to `.env` and update the configuration variables accordingly.
+   Create a `.env` file in the project root directory. A sample file `.env.example` is provided. Copy its content to `.env` and update the configuration variables accordingly.
 
 ```bash
 cp .env.sample .env
@@ -41,7 +41,7 @@ alembic upgrade heads
 
 5. **Start RabbitMQ**:
 
-If RabbitMQ is not already running, start it with:
+   If RabbitMQ is not already running, start it with:
 
 ```bash
 rabbitmq-server
@@ -49,7 +49,7 @@ rabbitmq-server
 
 6. **Start Redis**:
 
-If Redis is not already running, start it with:
+   If Redis is not already running, start it with:
 
 ```bash
 redis-server
@@ -57,7 +57,7 @@ redis-server
 
 7. **Run the Celery worker**:
 
-Start the celery worker to handle background tasks:
+   Start the celery worker to handle background tasks:
 
 ```bash
 celery -A app.services.task_scheduler.celery_app worker --loglevel=info
@@ -65,7 +65,7 @@ celery -A app.services.task_scheduler.celery_app worker --loglevel=info
 
 8. **Run the FastAPI Project**:
 
-Start the FastAPI server with:
+   Start the FastAPI server with:
 
 ```bash
 uvicorn app.main:app --reload
