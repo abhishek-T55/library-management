@@ -34,7 +34,7 @@ def get_user_by_id(user_id: int, session: SessionDep):
 def list_all_users(*, request:Request, session: SessionDep):
     db_users = app.crud.get_all_users(session=session)
     redis_client.setex("users", 60, json.dumps([user.model_dump() for user in db_users]))
-    return app.crud.get_all_users(session=session)
+    return db_users
 
 
 @router.post(
