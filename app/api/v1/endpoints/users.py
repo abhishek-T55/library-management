@@ -1,29 +1,38 @@
 from typing import Any, List
+import json
 from fastapi import APIRouter, HTTPException, Depends, Request
 from app.db.models import UserCreate, User, UserUpdate, UserPublic
 import app.crud
 from app.api.v1.deps import get_current_user
 from app.api.v1.deps import SessionDep
+import app.utils.cache
 
+from app.utils.cache import redis_client
+import app.utils
 from app.utils.rate_limiting import limiter
-
 
 router = APIRouter()
 
 @router.get("/{user_id}", dependencies=[Depends(get_current_user)], response_model=User)
 def get_user_by_id(user_id: int, session: SessionDep):
+    cached_user = redis_client.get(f"user: {user_id}")
+    if cached_user:
+        return json.loads(cached_user)
     db_user = session.get(User, user_id)
     if not db_user:
         raise HTTPException(
             status_code=404,
             detail="The user with this id does not exist in the system",
         )
+    redis_client.setex(f"user: {user_id}", 60, json.dumps(db_user.model_dump()))
     return db_user
 
 
 @router.get("/", dependencies=[Depends(get_current_user)], response_model=List[User])
 @limiter.limit("10/minute")
 def list_all_users(*, request:Request, session: SessionDep):
+    db_users = app.crud.get_all_users(session=session)
+    redis_client.setex("users", 60, json.dumps([user.model_dump() for user in db_users]))
     return app.crud.get_all_users(session=session)
 
 
