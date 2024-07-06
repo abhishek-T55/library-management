@@ -28,6 +28,12 @@ class UserUpdate(UserBase):
     password: str = None
 
 
+class UserRegister(BaseModel):
+    email: EmailStr
+    password: str
+    full_name: str | None
+
+
 class UserResponse(UserBase):
     id: int
     full_name: str | None

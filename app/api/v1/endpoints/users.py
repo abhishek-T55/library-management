@@ -12,10 +12,20 @@ from app.utils.cache import redis_client
 import app.utils
 from app.utils.rate_limiting import limiter
 from app.services.task_scheduler import send_registration_email
-from app.schemas.user import UserResponse, UserCreate, UserBookCountResponse
+from app.schemas.user import UserResponse, UserCreate, UserBookCountResponse, UserRegister
 from app.exceptions import UserNotFoundException, UserAlreadyExistsException
 
 router = APIRouter()
+
+@router.post("/signup", response_model=UserPublic)
+def register_user(session: SessionDep, user_in: UserRegister) -> Any:
+    user = app.crud.get_user_by_email(session=session, email=user_in.email)
+    if user:
+        raise UserAlreadyExistsException()
+    user_create = UserRegister.model_validate(user_in)
+    user = app.crud.create_user(session=session, user_create=user_create)
+    send_registration_email(user.email)
+    return user
 
 @router.get(
     "/{user_id}",
@@ -66,7 +76,6 @@ def create_user(*, request: Request, session: SessionDep, user_in: UserCreate) -
     if user:
         raise UserAlreadyExistsException()
     user = app.crud.create_user(session=session, user_create=user_in)
-    send_registration_email(user.email)
     return user
 
 
