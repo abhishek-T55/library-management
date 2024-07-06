@@ -55,6 +55,7 @@ def delete_book(book_id: int, session: SessionDep):
 @router.patch(
     "/{book_id}",
     response_model=BookResponse,
+    dependencies=[Depends(get_current_user)]
 )
 def update_book(
     *,
