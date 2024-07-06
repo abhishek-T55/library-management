@@ -1,5 +1,6 @@
 from typing import Any, List
 from sqlmodel import Session, select
+from sqlalchemy.sql import func
 from app.db.models import Book, BookCreate, BookUpdate
 from app.schemas.book import BookResponse, BookFilter, Pagination
 from app.exceptions import BookNotFoundException
@@ -16,7 +17,7 @@ def get_filtered_books(
 ) -> List[BookResponse]:
     query = select(Book)
     if filters.title:
-        query = query.where(Book.title == filters.title)
+        query = query.where(func.lower(Book.title) == func.lower(filters.title))
 
     if filters.owner_id:
         query = query.where(Book.owner_id == filters.owner_id)
