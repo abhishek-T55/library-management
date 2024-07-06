@@ -17,6 +17,7 @@ def get_filtered_books(
 ) -> List[BookResponse]:
     query = select(Book)
     if filters.title:
+        # TODO: implement sql ilike operator
         query = query.where(func.lower(Book.title) == func.lower(filters.title))
 
     if filters.owner_id:
