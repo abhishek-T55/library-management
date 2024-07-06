@@ -82,6 +82,7 @@ def create_user(*, request: Request, session: SessionDep, user_in: UserCreate) -
 @router.patch(
     "/{user_id}",
     response_model=UserResponse,
+    dependencies=[Depends(get_current_user)]
 )
 def update_user(
     *,

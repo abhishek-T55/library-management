@@ -33,6 +33,20 @@ class UserRegister(BaseModel):
     password: str
     full_name: str | None
 
+    # TODO: Fix inheritence logic (redundant code)
+
+    @field_validator("password")
+    def password_length(cls, v):
+        if len(v) < 8 or len(v) > 20:
+            raise ValueError("Password must be between 8 and 20 characters")
+        return v
+
+    @field_validator("full_name")
+    def full_name_length(cls, v):
+        if v and len(v) > 100:
+            raise ValueError("Full name must be less than 100 characters")
+        return v
+
 
 class UserResponse(UserBase):
     id: int

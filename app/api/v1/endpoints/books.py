@@ -19,7 +19,7 @@ from app.utils.rate_limiting import limiter
 router = APIRouter()
 
 
-@router.get("/filter")
+@router.get("/filter", dependencies=[Depends(get_current_user)], response_model=List[Book])
 def get_filtered_books(
     *,
     session: SessionDep,
