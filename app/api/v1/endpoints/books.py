@@ -1,12 +1,13 @@
-from app.db.models import Book, BookUpdate
+from typing import Optional
+from app.db.models import Book
 from app.schemas.book import BookCreate
-from fastapi import APIRouter, Request, Depends
+from fastapi import APIRouter, Request, Depends, Query
 import app.crud
 import json
 from app.api.v1.deps import get_current_user
 from app.api.v1.deps import SessionDep
 from app.db.models import User
-from app.schemas.book import BookResponse
+from app.schemas.book import BookResponse, BookFilter, Pagination
 from app.exceptions import BookNotFoundException
 import app.utils.cache
 from typing import Any, List
@@ -16,6 +17,21 @@ import app.utils
 from app.utils.rate_limiting import limiter
 
 router = APIRouter()
+
+
+@router.get("/filter")
+def get_filtered_books(
+    *,
+    session: SessionDep,
+    title: Optional[str] = Query(None),
+    owner_id: Optional[int] = Query(None),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(10, le=100)
+):
+    filters = BookFilter(title=title, owner_id=owner_id)
+    pagination = Pagination(skip=skip, limit=limit)
+    books = app.crud.get_filtered_books(session=session, filters=filters, pagination=pagination)
+    return books
 
 
 @router.get("/{book_id}", dependencies=[Depends(get_current_user)], response_model=BookResponse)

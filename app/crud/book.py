@@ -1,11 +1,29 @@
 from typing import Any, List
 from sqlmodel import Session, select
 from app.db.models import Book, BookCreate, BookUpdate
-from app.schemas.book import BookResponse
+from app.schemas.book import BookResponse, BookFilter, Pagination
 from app.exceptions import BookNotFoundException
 
 def get_all_books(*, session: Session) -> List[BookResponse]:
     books = session.exec(select(Book)).all()
+    return books
+
+def get_filtered_books(
+    *,
+    session: Session,
+    filters: BookFilter,
+    pagination: Pagination
+) -> List[BookResponse]:
+    query = select(Book)
+    if filters.title:
+        query = query.where(Book.title == filters.title)
+
+    if filters.owner_id:
+        query = query.where(Book.owner_id == filters.owner_id)
+
+    query = query.offset(pagination.skip).limit(pagination.limit)
+
+    books = session.exec(query).all()
     return books
 
 def create_book(*, session: Session, book_create: BookCreate, owner_id: int) -> BookResponse:

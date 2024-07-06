@@ -1,4 +1,5 @@
 from pydantic import BaseModel, field_validator
+from typing import Optional
 
 
 class BookBase(BaseModel):
@@ -31,3 +32,13 @@ class BookResponse(BookBase):
 
     class Config:
         from_attributes = True
+
+
+class BookFilter(BaseModel):
+    title: Optional[str] = None
+    owner_id: Optional[int] = None
+
+
+class Pagination(BaseModel):
+    skip: int = 0
+    limit: int = 0
