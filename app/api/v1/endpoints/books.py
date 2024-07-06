@@ -60,7 +60,7 @@ def update_book(
     *,
     session: SessionDep,
     book_id: int,
-    book_in: BookUpdate
+    book_in: BookCreate
 ) -> Any:
     db_book = session.get(Book, book_id)
     if not db_book:
